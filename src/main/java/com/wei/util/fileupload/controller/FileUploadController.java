@@ -1,18 +1,15 @@
 package com.wei.util.fileupload.controller;
 
 import com.wei.util.fileupload.commons.Result;
+import com.wei.util.fileupload.commons.editor.Success;
+import com.wei.util.fileupload.commons.editor.SuccessMsg;
 import com.wei.util.fileupload.utils.FdfsUtil;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/file/upload")
@@ -63,5 +59,21 @@ public class FileUploadController {
     @Operation(summary = "根据指定的url地址删除文件")
     public Result delete(String url){
         return fdfsUtil.deleteFile(url);
+    }
+
+    @PostMapping(value = "/editor/file", consumes = "multipart/form-data")
+    @Operation(summary = "富文本编辑器文件上传")
+    public Success editorUploadFile(@RequestParam("file") MultipartFile file){
+        Result result = fdfsUtil.uploadFile(file);
+        Success success = new Success();
+        if (result.getSuccess()){
+            success.setErrno(0);
+            SuccessMsg successMsg = new SuccessMsg();
+            successMsg.setUrl(result.getMessage());
+            success.setData(successMsg);
+        }else {
+            success.setErrno(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+        return success;
     }
 }
