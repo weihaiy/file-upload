@@ -6,9 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import com.github.tobato.fastdfs.domain.fdfs.StorePath;
 import com.github.tobato.fastdfs.domain.fdfs.ThumbImageConfig;
 import com.github.tobato.fastdfs.domain.proto.storage.DownloadByteArray;
-import com.github.tobato.fastdfs.domain.upload.FastImageFile;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
-import com.wei.util.fileupload.commons.FastDFSConfig;
 import com.wei.util.fileupload.commons.FileType;
 import com.wei.util.fileupload.commons.Result;
 import org.apache.commons.io.FilenameUtils;
@@ -24,10 +22,18 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 public class FdfsUtil {
+    private final FastFileStorageClient fastFileStorageClient;
+
+    private final ThumbImageConfig thumbImageConfig;
+
+    private final RedisUtil redisUtil;
+
     @Autowired
-    private FastFileStorageClient fastFileStorageClient;
-    @Autowired
-    private ThumbImageConfig thumbImageConfig;
+    public FdfsUtil(FastFileStorageClient fastFileStorageClient, ThumbImageConfig thumbImageConfig, RedisUtil redisUtil) {
+        this.fastFileStorageClient = fastFileStorageClient;
+        this.thumbImageConfig = thumbImageConfig;
+        this.redisUtil = redisUtil;
+    }
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Value("${fdfs.web-server-url}")
